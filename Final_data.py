@@ -1,3 +1,17 @@
+
+"""
+Urban Housing Data Integration
+-----------------------------
+This script integrates, cleans, and analyzes urban housing data from multiple sources (API, CSV, Excel, PDF, Web Scraping).
+It produces a merged dataset for Florida housing analysis.
+
+Usage:
+    python Final_data.py
+
+Output:
+    Merger_cleaned_Prepared_data_for_Florida_by_group_9.csv
+"""
+
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -5,6 +19,11 @@ import pdfplumber
 
 # Function to Fetch and process API Data for Housing Trends from API endpoint
 def fetch_api_housing_trends():
+    """
+    Fetch and process housing trends data from Zillow API for selected Florida cities.
+    Returns:
+        pd.DataFrame: DataFrame with columns [City, Years, Property Value]
+    """
     # API url
     url = "https://zillow-com4.p.rapidapi.com/properties/zestimate-history"
 
@@ -54,6 +73,13 @@ def fetch_api_housing_trends():
 
 # function for Loading and cleaning Housing data from CSV file
 def clean_csv_housing_data(file_name):
+    """
+    Load and clean housing data from a CSV file, focusing on Florida.
+    Args:
+        file_name (str): Path to CSV file.
+    Returns:
+        pd.DataFrame: Cleaned DataFrame for Florida.
+    """
     df_csv = pd.read_csv(file_name)
 
     # selecting dataFrame just for Florida
@@ -74,6 +100,13 @@ def clean_csv_housing_data(file_name):
 
 # Function for loading and cleaning Rental data from CSV
 def clean_rental_data(file_path):
+    """
+    Load and clean rental data from a CSV file for selected Florida cities.
+    Args:
+        file_path (str): Path to rental CSV file.
+    Returns:
+        pd.DataFrame: Cleaned rental DataFrame.
+    """
     df = pd.read_csv(file_path)
 
     # Filter for Florida cities: Osceola and Charlotte
@@ -95,6 +128,11 @@ def clean_rental_data(file_path):
 
 # Function to extract rental listings and description by web scraping www.redfin.com website
 def scrape_web_data():
+    """
+    Scrape rental listings and descriptions from Redfin for Florida apartments.
+    Returns:
+        pd.DataFrame: DataFrame with rental address, price, description, and contact.
+    """
     web_url = "https://www.redfin.com/state/Florida/apartments-for-rent"
     web_headers = {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -160,6 +198,13 @@ def scrape_web_data():
 
 # Function to load and extract household demographic data from Excel file
 def extract_household_data(file_path):
+    """
+    Extract household demographic data from an Excel file.
+    Args:
+        file_path (str): Path to Excel file.
+    Returns:
+        pd.DataFrame: DataFrame with household categories and values.
+    """
     # Load the 'Data' sheet
     df = pd.read_excel(file_path, sheet_name='Data', skiprows=2)
 
@@ -203,6 +248,15 @@ def extract_household_data(file_path):
 # Function to load and extract household ownership data from PDF
 
 def extract_homeownership_data(pdf_path, start_page=32, end_page=39):
+    """
+    Extract household ownership data from a PDF file for specified pages.
+    Args:
+        pdf_path (str): Path to PDF file.
+        start_page (int): Start page number (1-indexed).
+        end_page (int): End page number (1-indexed).
+    Returns:
+        pd.DataFrame: DataFrame with homeownership statistics.
+    """
     # Extract text from specified pages
     lines = []
     with pdfplumber.open(pdf_path) as pdf:
@@ -256,6 +310,11 @@ def extract_homeownership_data(pdf_path, start_page=32, end_page=39):
 
 # Function to handle merging and cleaning of the data.
 def process_and_clean_data():
+    """
+    Main pipeline to load, clean, merge, and save Florida housing data from all sources.
+    Output:
+        Merger_cleaned_Prepared_data_for_Florida_by_group_9.csv
+    """
     # Load datasets
     housing_trends_df = fetch_api_housing_trends()
     rental_price_df = scrape_web_data()
@@ -339,4 +398,11 @@ def process_and_clean_data():
     merged_df.to_csv('Merger_cleaned_Prepared_data_for_Florida_by_group_9.csv', index=False)
     print("Dataset saved as 'Merger_cleaned_Prepared_data_for_Florida_by_group_9.csv'.")
 
-process_and_clean_data()
+def main():
+    """
+    Entrypoint for running the data integration pipeline.
+    """
+    process_and_clean_data()
+
+if __name__ == "__main__":
+    main()
